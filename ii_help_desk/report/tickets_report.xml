@@ -1,0 +1,14 @@
+<odoo>
+  <data>
+<record id="report_team_tickets_data" model="ir.actions.report">
+        <field name="name">Ticket Per Team (PDF)</field>
+        <field name="model">hd.ticket</field>
+        <field name="report_type">qweb-pdf</field>
+        <field name="report_name">ii_help_desk.report_team_ticketsdata</field>
+        <field name="report_file">ii_help_desk.report_team_ticketsdata</field>
+        <field name="binding_model_id" eval="False"/>
+        <field name="binding_type">report</field>
+    </record>
+
+</data>
+</odoo>

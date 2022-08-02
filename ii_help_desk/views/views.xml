@@ -1,0 +1,223 @@
+<odoo>
+  <data>
+   
+    <menuitem id="menu_ii_helpdesk_root" name="Helpdesk"
+        sequence="28"
+        web_icon="ii_help_desk,static/description/icon.png"
+        groups="ii_help_desk.group_helpdesk_engineer"
+        />
+    <menuitem id="tickets_menu" name="Tickets"
+        sequence="10" parent="ii_help_desk.menu_ii_helpdesk_root"
+         groups="ii_help_desk.group_helpdesk_engineer"
+        />
+
+
+    <menuitem id="report_menu" name="Reporting"
+        sequence="30" parent="ii_help_desk.menu_ii_helpdesk_root"
+         groups="ii_help_desk.group_helpdesk_team_leader"
+        />
+
+    <menuitem id="configuration_menu" name="Configuration"
+        sequence="40" parent="ii_help_desk.menu_ii_helpdesk_root"
+         groups="ii_help_desk.group_helpdesk_manger"
+        />
+
+    <!--HD TAGs -->
+    <record id="ii_helpdesk_tag_view_tree" model="ir.ui.view">
+        <field name="name">Helpdesk Tags</field>
+        <field name="model">hd.tags</field>
+        <field name="arch" type="xml">
+            <tree editable="top" string="Tag" sample="1">
+                <field name="name"/>
+                <field name="color" widget="color_picker"/>
+            </tree>
+        </field>
+    </record>
+
+    <record id="hd_tag_action" model="ir.actions.act_window">
+        <field name="name">Ticket Tags</field>
+        <field name="res_model">hd.tags</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No tags found. Let's create one!
+          </p><p>
+            Tags are perfect to organize your tickets.
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="tags_menu" name="Tags"
+        sequence="20" parent="ii_help_desk.configuration_menu"
+         groups="ii_help_desk.group_helpdesk_manger"
+        />
+    <menuitem id="hd_tag_menu" action="hd_tag_action"
+        sequence="1" parent="ii_help_desk.tags_menu"
+        groups="ii_help_desk.group_helpdesk_manger"
+        />
+
+<!--Tickets Views and action -->
+    <!-- ticket tree view -->
+        <record id="all_tickets_view_tree" model="ir.ui.view">
+            <field name="name">Tickets tree view</field>
+            <field name="model">hd.ticket</field>
+            <field name="arch" type="xml">
+                <tree string="Tickets" decoration-success="state=='solved'" decoration-muted ="state=='cancel'" decoration-info ="state=='inprogress'" >
+                    <field name="ticket_id"/>
+                    <field name="name"/>
+                    <field name="partner_id"/>
+                    <field name="user_id" string="Assigned to"/>
+                    <field name="team_id"/>
+                    <field name="submit_date"/>
+                    <field name="state"/>
+                    <field name="priority" optional="hide"/>
+                    <field name="tags_id" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                     <field name="company_id"  optional="show" readonly="1"/>
+
+
+                </tree>
+            </field>
+        </record>
+
+    <!-- ticket form view -->
+        <record id="all_tickets_view_form" model="ir.ui.view">
+            <field name="name">Tickets form view</field>
+            <field name="model">hd.ticket</field>
+            <field name="arch" type="xml">
+                <form string="Tickets">
+                    <header>
+                        <button name="submit" type="object"
+                           string="Submit" states="new" class="oe_highlight" groups="ii_help_desk.group_helpdesk_team_leader"/>
+                           
+                        
+                        <button name="done" type="object"
+                           string="Done" states="inprogress" class="oe_highlight" groups="ii_help_desk.group_helpdesk_engineer"/>
+                        
+                        <button name="cancel" type="object"
+                           string="Cancel" states="inprogress" class="oe_highlight"/>
+
+                        <field name="state" widget="statusbar" statusbar_visible="new,inprogress,solved"/>
+                     </header>
+                    <sheet string="Tickets Managements">
+                        <div class="oe_title">
+                            <h1><field name="name" class="field_name" placeholder="Name..."/></h1>
+                            
+                        </div>
+                        <group >
+                            <field name="ticket_id"/>
+                            <field name="team_id"/>
+                            <field name="user_id" string="Assigned to"/>
+                            <field name="priority" widget="priority"/>
+                            <field name="tags_id" widget="many2many_tags" options="{'color_field': 'color','no_create': True}" />
+                            <field name="company_id"/>
+                                
+                        </group>
+                        <group>
+                            <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one"/>
+                            <field name="partner_name" attrs="{'invisible': [('partner_id', '!=', False)]}"/>
+                            <field name="partner_email"/>
+                            <field name="partner_phone"/>
+                            </group>
+                        <field name="description" class="field_description" placeholder="Description of the ticket..."/>
+                        
+                        <group>
+                            <field name="host_type" required="1"/>
+                            <field name="server_url" attrs="{'invisible':['|',('host_type','=','cloud'),('host_type','=',False)],'required':[('host_type','!=','cloud')]}"/>
+                            
+                        </group>
+                        <group group="ii_help_desk.group_helpdesk_team_leader">
+                             <label for="resolution_time" string="Service Duration" />
+                                <div >
+                                    <field name="resolution_time" class="oe_inline "/>
+                                    <span class="oe_inline col-6">Days </span>
+                                </div>
+                        </group>
+
+
+
+                    </sheet>
+                    <div class="oe_chatter">
+                        <field name="message_follower_ids"/>
+                        <field name="activity_ids"/>
+                        <field name="message_ids" options="{'post_refresh': 'recipients'}"/>
+                    </div>
+                </form>
+        </field>
+        </record>
+
+
+
+<!-- tickets action -->
+    <record id="my_tickets_action" model="ir.actions.act_window">
+        <field name="name">My Tickets</field>
+        <field name="res_model">hd.ticket</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="domain">[('user_id', '=', uid)]</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No Tikcet found. Let's create one!
+          </p>
+        </field>
+    </record>
+
+    <record id="all_tickets_action" model="ir.actions.act_window">
+        <field name="name">All Tickets</field>
+        <field name="res_model">hd.ticket</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No Tikcet found. Let's create one!
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="hd_all_ticket_menu" action="all_tickets_action"
+        sequence="1" parent="ii_help_desk.tickets_menu"
+        groups="ii_help_desk.group_helpdesk_engineer"
+        />
+    <menuitem id="hd_my_ticket_menu" action="my_tickets_action"
+        sequence="2" parent="ii_help_desk.tickets_menu"
+        groups="ii_help_desk.group_helpdesk_engineer"
+        />
+<!-- team views and actions -->
+        <record id="team_view_form" model="ir.ui.view">
+            <field name="name">Team form view</field>
+            <field name="model">hd.team</field>
+            <field name="arch" type="xml">
+                <form string="Tickets">
+                    <header>
+
+                        </header>
+                        <sheet>
+                            <group>
+                                <field name="name"/>
+                                <field name="max_resolution_time"/>
+                            </group>
+                        </sheet>
+
+                    </form>
+                </field>
+            </record>
+
+    <record id="team_action" model="ir.actions.act_window">
+        <field name="name">Teams</field>
+        <field name="res_model">hd.team</field>
+        <field name="view_mode">tree,form,kanban</field>
+        <field name="help" type="html">
+          <p class="o_view_nocontent_smiling_face">
+            No team found
+          </p>
+        </field>
+    </record>
+
+    <menuitem id="team_main_menu" name="Teams"
+        sequence="2" parent="ii_help_desk.configuration_menu"
+        groups="ii_help_desk.group_helpdesk_manger"
+        />
+    <menuitem id="team_menu" action="team_action"
+        sequence="1" parent="ii_help_desk.team_main_menu"
+        groups="ii_help_desk.group_helpdesk_manger"
+        />
+
+  </data>
+</odoo>

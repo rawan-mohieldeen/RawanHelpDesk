@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="ticket_portal_layout" name="Portal layout: Tickets menu entry" inherit_id="portal.portal_breadcrumbs" priority="80">
+        <xpath expr="//ol[hasclass('o_portal_submenu')]" position="inside">
+            <li t-if="page_name == 'tickets' or tickets" class="col-lg-2" t-attf-class="breadcrumb-item #{'active ' if not tickets else ''}">
+                <a t-if="tickets" t-attf-href="/my/tickets?{{ keep_query() }}">Tickets</a>
+                <t t-else="">Tickets</t>
+            </li>
+            
+            
+        </xpath>
+    </template>
+
+    <template id="portal_my_home" name="Show Tickets" customize_show="True" inherit_id="portal.portal_my_home" priority="40">
+        <xpath expr="//div[hasclass('o_portal_docs')]" position="inside">
+            <t t-call="portal.portal_docs_entry">
+                <t t-set="title">Tickets</t>
+                <t t-set="url" t-value="'/my/tickets'"/>
+                <t t-set="placeholder_count" t-value="'ticket_count'"/>
+            </t>
+            
+        </xpath>
+    </template>
+
+    <template id="portal_my_tickets" name="My Tickets">
+        <t t-call="portal.portal_layout">
+            <t t-set="breadcrumbs_searchbar" t-value="True"/>
+
+            <t t-call="portal.portal_searchbar">
+                <t t-set="title">Tickets</t>
+            </t>
+            <t t-if="not tickets">
+                <div class="alert alert-warning mt8" role="alert">
+                    There are no Tickets.
+                </div>
+            </t>
+        <t t-if="tickets" t-call="portal.portal_table">
+            <thead>
+          <tr >
+            <th>Ticket #</th>
+            <th class="text-right">Name</th>
+          </tr>
+        </thead>
+        <tbody>
+          <t t-foreach="tickets" t-as="t">
+            <tr>
+              <td>
+                <a >
+                  <t t-esc="t.ticket_id"/>
+               </a>
+              </td>
+              <td class="text-right">
+                <span t-field="t.name"/>
+              </td>
+              <td>
+                <t t-if="t.state == 'inprogress'">
+                  <span class="badge badge-info"> Inprogress</span>
+                </t>
+                <t t-if="t.state == 'solved'">
+                  <span class="badge badge-sucess"> Solved</span>
+                </t>
+                <t t-if="t.state == 'draft'">
+                  <span class="badge badge-secondary"> New</span>
+                </t>
+                <t t-if="t.state == 'cancel'">
+                  <span class="badge badge-secondary">Cancelled</span>
+                </t>
+              </td>
+              
+            </tr>
+          </t>
+        </tbody>
+      </t>
+  </t>
+
+            
+    </template>
+
+
+  
+   
+</odoo>

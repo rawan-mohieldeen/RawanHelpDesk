@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <template id="report_team_ticketsdata">
+        <t t-foreach="state" t-as="state">
+        <t t-call="web.html_container">
+            <t t-foreach="docs" t-as="o">
+                <t t-call="web.external_layout">
+                    <div class="header">
+                        <div class="row">
+                            <div class="col-xs-3 mb4">
+                                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % to_text(company.logo)" style="max-height: 45px;"/>
+                            </div>
+                            <div class="col-xs-9 text-right" style="margin-top:22px;" t-field="company.report_header" name="moto"/>
+                        </div>
+                        <div t-if="company.logo or company.report_header" class="row zero_min_height">
+                            <div class="col-xs-12">
+                                <div style="border-bottom: 1px solid black;"/>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-xs-6" name="company_address">
+                                <span t-field="company.partner_id"
+                                    t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'
+                                    style="border-bottom: 1px solid black; display:inline-block;"/>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page">
+                        <div class="oe_structure">
+                            <div class="row row-centered">
+                                <div class="col-md-12 col-centered">
+                                    <group string="Tickets Information">
+                                       <div>
+                                        <h2><center><strong>Tickets Per Team</strong></center></h2>
+                                       </div>
+                                        <div class="raw">
+                                            <div>
+                                                Ticket Status <p t-esc="state"></p>
+                                            </div>
+                                            >
+
+                                        </div>
+                                            
+                                           
+                                         <table class="table-bordered td" width="100%">
+                                            <thead>
+                                                <tr style="background-color: #F2F2F2;">
+                                                    <th style="text-align: center; padding: 10px;">Ticket ID.</th>
+                                                    <th style='text-align: center; padding: 15px;'>Name</th>
+                                                    <th style='text-align: center; padding: 15px;'>Time Submitted</th>
+                                                    <th style='text-align: center; padding: 15px;'>Priority</th>
+                                                    <th style='text-align: center; padding: 15px;'>Resolution Time</th>
+                                                    
+                                                </tr>
+                                            </thead>
+                                           
+                                            <tbody>
+                                                
+                                                <tr t-foreach="lines_data" t-as="b">
+                                                    <t t-if="b.get('state') == state">
+                                                    <td style='text-align: center; padding: 5px;'>
+                                                        <span t-esc="b.get('ticket_id')" />
+                                                    </td>
+                                                    <td style='text-align: center; padding: 5px;'>
+                                                        <span t-esc="b.get('name')" />
+                                                    </td>
+                                                    <td class="text-center">
+                                                        <span t-esc="b.get('time')" t-options='{"widget": "date"}'/>
+                                                    </td>
+                                                    <td style='text-align: center; padding: 5px;'>
+                                                        <span t-esc="b.get('prioraty')"/>
+                                                    </td>
+                                                    <td style='text-align: center; padding: 5px;'>
+                                                        <span t-esc="b.get('resolution_time')"/>
+                                                    </td>
+                                                    
+                                                    
+                                                    
+                                                </t>
+                                                </tr>
+                                                
+                                            </tbody>
+                                        </table>
+                                    </group>
+                                </div>
+                            </div>
+                        </div>
+                    <!-- </t> -->
+                    </div>
+                </t>
+            </t>
+        </t>
+    </t>
+    </template>
+
+</odoo>
